@@ -1,10 +1,31 @@
 const http = require('http');
 const htmlHandler = require('./htmlResponses.js')
-const jsonResponseHandler = require('./jsonResponses.js');
+const jsonHandler = require('./jsonResponses.js');
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
-const handlePost = (request, response, parsedURL) => {
+const parseBody = (request, response, handler) => {
+    const body = [];
+    request.on('eeror', (err) => {
+        console.dir(err);
+        response.statusCode = 400;
+        response.end();
+    });
 
+    request.on('data', (chunk) =>{ 
+        body.push(chunk);
+    });
+
+    request.on('end', ()=> {
+        const bodyString = Buffer.concat(body).toString();
+        request.body = JSON.parse(bodyString);
+        handler(request, response);
+    });
+}
+
+const handlePost = (request, response, parsedURL) => {
+    if(parsedURL.pathname === '/addUser'){
+        parseBody(request, response, jsonHandler.addUser);
+    }
 };
 
 const handleGet = (request, response, parsedURL) => {
@@ -13,6 +34,7 @@ const handleGet = (request, response, parsedURL) => {
             htmlHandler.getStyle(request, response);
             break;
         case '/getUsers':
+            jsonHandler.getUsers(request, response);
             break;
         default:
             htmlHandler.getIndex(request, response);
