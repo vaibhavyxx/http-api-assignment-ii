@@ -5,7 +5,7 @@ const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
 const parseBody = (request, response, handler) => {
     const body = [];
-    request.on('eeror', (err) => {
+    request.on('error', (err) => {
         console.dir(err);
         response.statusCode = 400;
         response.end();
@@ -35,6 +35,9 @@ const handleGet = (request, response, parsedURL) => {
             break;
         case '/getUsers':
             jsonHandler.getUsers(request, response);
+            break;
+        case '/notREAL':
+        case 'notFound': jsonHandler.notFound(request, response);
             break;
         default:
             htmlHandler.getIndex(request, response);

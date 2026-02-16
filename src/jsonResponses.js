@@ -1,5 +1,5 @@
 let users = {};
-const respondJSON = (request, response, status, object) => {
+const respond = (request, response, status, object) => {
     const content = JSON.stringify(object);
     response.writeHead(status, {
         'Content-Type': 'application/json',
@@ -14,33 +14,41 @@ const respondJSON = (request, response, status, object) => {
 
 const getUsers = (request, response) => {
     const responseJSON = {users,};
-    respondJSON(request, response, 200, responseJSON);
+    respond(request, response, 200, responseJSON);
 }
 
 const addUser = (request, response) => {
-    const responseJSON = {
+    const responseData = {
         message: 'Name and age are both required',
     };
     const {name, age} = request.body;
     if(!name || !age){
-        responseJSON.id = 'missingParams';
-        return respondJSON(request, response, 400, responseJSON);
+        responseData.id = 'missingParams';
+        return respond(request, response, 400, responseData);
     }
 
-    let responseCode = 204;
+    let responseStatus = 204;
     //Create the user if it does not exist
     if(!users[name]){
-        responseCode = 201; //Created status
+        responseStatus = 201; //Created status
         users[name] = {
             name: name,
         };
     }
     
     users[name].age = age;
-    if(responseCode === 201){
-        respondJSON.message = 'Created Successfully';
-        return respondJSON(request, response, responseCode, responseJSON);
+    if(responseStatus === 201){
+        responseData.message = 'Created Successfully';
+        return respond(request, response, responseStatus, responseData);
     }
-    return respondJSON(request, response, responseCode, {});
+    return respond(request, response, responseStatus, {});
 };
-module.exports = {addUser, getUsers};
+
+const notFound = (request, response) => {
+    const json = {
+        message: "The page you are looking for is not found",
+        id:'Not Found',
+    }
+    respond(request, response, 404, json);
+};
+module.exports = {addUser, getUsers, notFound};
