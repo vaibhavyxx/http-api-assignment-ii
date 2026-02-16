@@ -5,30 +5,42 @@
   <link rel="stylesheet" type="text/css" href="/style.css">
 
   <script>
-    const  handleResponse = async (response) => {
+
+  const headerContent = (response) => {
     const content = document.querySelector('#content');
     let phrase = "";
-    switch(response.status){
+      switch(response.status){
         case 200:
-            phrase = `<b>Success</b>`
-            break;
-        case 201:
-            phrase = `<b>Created</b>`
-            break;
+          phrase = `<b>Success</b>`;
+           break;
+         case 201:
+          phrase = `<b>Created</b>`;
+          break;
         case 204:
-            phrase = `<b>Updated (No Content)</b>`
-            break;
+          phrase = `<b>Updated (No Content)</b>`
+          break;
         case 400:
-            phrase = `<b>Bad Request</b>`
-            break;
+          phrase = `<b>Bad Request</b>`
+          break;
+        case 404:
+          phrase =`<b>Not Found</b>`
+          break;
         default:
-            phrase = `Error code not implemented`
-            break;
-    }
-    content.innerHTML = phrase;
-    if(response.method === 'GET'){
+          phrase = `Error code not implemented`
+          break;
+  }
+  content.innerHTML = phrase;
+}
+
+const  handleResponse = async (response) => {
+    const content = document.querySelector('#content');
+    headerContent(response);
+    
+    if(response.status !== 204){
       const obj = await response.json();  //parses response to json
-      if(obj.message) content.innerHTML += `<p>${obj.message}</p>`;   
+      //if(obj.message) content.innerHTML += `<p>${obj.message}</p>`;  
+        const objString = JSON.stringify(obj);
+        content.innerHTML += `<p>${objString}</p>`;   
     }
 }
 
@@ -43,6 +55,7 @@ const sendPost = async(nameForm) => {
 
     let formData = `name=${name}&age=${age}`;
     formData = JSON.stringify({name, age});
+    const validity = document.querySelector('#urlField').value;
       const response = await fetch(url, {
         method: method,
         headers:{
@@ -52,7 +65,7 @@ const sendPost = async(nameForm) => {
         },
         body: formData,
     });
-    handleResponse(response);
+    if(validity === '/getUsers') handleResponse(response);
     
 }
 
@@ -75,15 +88,9 @@ const init = () => {
           'Accept': 'application/json'
         }
       });
-      handleResponse(response);
-      /*if(methodSelect === 'head'){
-        const content = document.querySelector('#content');
-        content.innerHTML = `<b>Status: ${response.status}</b>`;
-        //content.innerHTML += `<p>Headers received, no body (HEAD request)</p>`;
-      }else{
-        handleResponse(response);
-      }*/
-      //sendPost(nameForm);
+
+      if(methodSelect === 'head') headerContent(response)
+      else handleResponse(response);
     }
     nameForm.addEventListener('submit', addUser);
     userForm.addEventListener('submit', getUser); 

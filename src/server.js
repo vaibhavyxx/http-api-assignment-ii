@@ -36,12 +36,14 @@ const handleGet = (request, response, parsedURL) => {
         case '/getUsers':
             jsonHandler.getUsers(request, response);
             break;
-        case '/notREAL':
-        case 'notFound': jsonHandler.notFound(request, response);
+        case '/notReal':
+            jsonHandler.notFound(request, response);
             break;
-        default:
+        case '/':
             htmlHandler.getIndex(request, response);
             break;
+        default:
+            jsonHandler.notFound(request, response);
     }
 }
 
@@ -52,6 +54,7 @@ const onRequest = (request, response) => {
     if(request.method === 'POST') handlePost(request, response, parsedURL);
     else handleGet(request, response, parsedURL);
 }
+
 http.createServer(onRequest).listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });

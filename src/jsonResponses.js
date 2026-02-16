@@ -26,9 +26,7 @@ const addUser = (request, response) => {
         responseData.id = 'missingParams';
         return respond(request, response, 400, responseData);
     }
-
     let responseStatus = 204;
-    //Create the user if it does not exist
     if(!users[name]){
         responseStatus = 201; //Created status
         users[name] = {
