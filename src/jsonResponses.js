@@ -6,7 +6,7 @@ const respond = (request, response, status, object) => {
         'Content-Length': Buffer.byteLength(content, 'utf8'),
     });
 
-    if(request.method !== 'HEAD' && status !== 204){
+    if(request.method !== 'HEAD' && status !== 204){    //204- No Content Added
         response.write(content);
     }
     response.end();
